@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <link rel="stylesheet" href="main.css">
 </head>
 <body>
     <h1>Ejercicio 5 - Promesas</h1>
@@ -18,19 +19,36 @@
         <tbody id="tableBody">
         </tbody>
     </table>
+    <div>
+        <form id="myForm" action="" novalidate>
+            <div id="id-box">
+                <label for="id">id: </label>
+                <input type="text" id="id" pattern="\d{0,}"/>
+            </div>
 
-    <form id="myForm" action="">
-        <label for="id">id: </label>
-        <input type="text" id="id" />
-
-        <label for="nombre">nombre: </label>
-        <input type="text" id="nombre" />
-
-        <label for="grupos">grupo: </label>
-        <select name="grupos" id="grupos">
-
-        </select>
-    </form>
+            <div id="nombre-box">
+                <label for="nombre">nombre: </label>
+                <input type="text" required pattern="[A-Za-z]{4,20}" id="nombre" />
+            </div>
+    
+            <div id="grupo-box">
+                <label for="grupos">grupo: </label>
+                    <select required name="grupos" id="grupos">
+                    </select>
+            </div>
+            
+            <div> 
+                <input type="submit" id="create" value="Create">
+                <input type="submit" id="update" value="Update">  
+            </div>
+            </form>
+            <form action="" id="Form-delete" novalidate>
+                <div class="delete" id="delete-box"> 
+                        <input type="submit" id="delete" value="Delete">
+                        <input id="deleteId" pattern="\d{1,}" type="text" />
+                </div>
+            </form>
+    </div>
     <script type="module" src="main.js"></script>
 </body>
 </html>
