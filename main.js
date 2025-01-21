@@ -31,14 +31,18 @@ document.addEventListener("DOMContentLoaded", async () => {
   });
 });
 
-staticDOM.btnCreate.addEventListener("click", createAlumno);
-staticDOM.btnUpdate.addEventListener("click", updateAlumno);
-staticDOM.btnDelete.addEventListener("click", deleteAlumno);
+staticDOM.btnCreate.addEventListener("click", (e) => {
+  e.preventDefault()
+  createAlumno()});
+staticDOM.btnUpdate.addEventListener("click", (e) => {
+  e.preventDefault()
+  updateAlumno()});
+staticDOM.btnDelete.addEventListener("click", (e) => {
+  e.preventDefault()
+  deleteAlumno()});
 
 staticDOM.formulario.addEventListener("submit", (e) => e.preventDefault());
-staticDOM.deleteFormulario.addEventListener("submit", (e) =>
-  e.preventDefault()
-);
+staticDOM.deleteFormulario.addEventListener("submit", (e) =>  e.preventDefault());
 
 async function groupsRead() {
   await fetch("http://localhost:3000/grupos")
@@ -103,7 +107,9 @@ async function createAlumno() {
       },
     })
       .then((response) => response.json())
-      .catch((error) => console.error("Error: ", error));
+      .catch((error) => {
+        
+        console.error("Error: ", error)});
 
     for (let i = staticDOM.tableBody.childElementCount - 1; i > -1; i--) {
       staticDOM.tableBody.removeChild(staticDOM.tableBody.children[i]);
@@ -112,8 +118,42 @@ async function createAlumno() {
   }
 }
 
+async function updateAlumno() {
+  if (IsValidFormToUpdate()) {
+    let datosUpdate = {
+      nombre: staticDOM.nombre.value,
+    };
+
+    let id = staticDOM.id.value;
+    let respuesta;
+
+    await fetch(`http://localhost:3000/alumnos/${id}`, {
+      method: "PATCH",
+      body: JSON.stringify(datosUpdate),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((response) => response.json())
+      .catch((error) => {
+        respuesta = response;
+        console.error("Error: ", error)})
+      .then((response) => {
+        respuesta = response;
+        console.log("Success: ", response)
+      });
+      for (let i = staticDOM.tableBody.childElementCount - 1; i > -1; i--) {
+        staticDOM.tableBody.removeChild(staticDOM.tableBody.children[i]);
+      }
+      dibujarTabla();
+  }
+
+}
+
 async function deleteAlumno() {
   let id = staticDOM.idDelete.value;
+  let box = staticDOM.deleteBox;
+  let respuesta;
   if (IsValidFormToDelete()) {
     await fetch(`http://localhost:3000/alumnos/${id}`, {
       method: "DELETE",
@@ -121,13 +161,31 @@ async function deleteAlumno() {
         "Content-Type": "application/json",
       },
     })
-      .then((response) => response.json())
-      .catch((error) => console.error("Error: ", error))
-      .then((response) => console.log("Success: ", response));
-
-    for (let i = staticDOM.tableBody.childElementCount - 1; i > -1; i--) {
-      staticDOM.tableBody.removeChild(staticDOM.tableBody.children[i]);
-    }
+      .then((response) => {
+        console.log(response);
+        if(response.ok) {
+          console.log("Success: ", response.statusText)
+          for (let i = staticDOM.tableBody.childElementCount - 1; i > -1; i--) {
+            staticDOM.tableBody.removeChild(staticDOM.tableBody.children[i]);
+          }
+        } else {
+          console.error("Error: ", response.statusText)
+          if (box.childElementCount == 2) {
+              let spanDelete = document.createElement("span");
+              spanDelete.textContent = response.statusText;
+              box.appendChild(spanDelete);
+            } else {
+              box.children[2].textContent = response.statusText;
+            }   
+            // for (let i = staticDOM.deleteBox.childElementCount - 1; i >= 2; i--) {
+            //   staticDOM.deleteBox.removeChild(staticDOM.deleteBox.children[i]);
+            // }
+        }
+      })
+      .catch((error) => {
+        console.error("Error: ", error)
+        alert(error);        
+      });
     dibujarTabla();
   }
 }
@@ -169,31 +227,7 @@ function IsValidFormToDelete() {
   return result;
 }
 
-async function updateAlumno() {
-  if (IsValidFormToUpdate()) {
-    let datosUpdate = {
-      nombre: staticDOM.nombre.value,
-    };
 
-    let id = staticDOM.id.value;
-
-    await fetch(`http://localhost:3000/alumnos/${id}`, {
-      method: "PATCH",
-      body: JSON.stringify(datosUpdate),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
-      .then((response) => response.json())
-      .catch((error) => console.error("Error: ", error))
-      .then((response) => console.log("Success: ", response));
-  }
-
-  for (let i = staticDOM.tableBody.childElementCount - 1; i > -1; i--) {
-    staticDOM.tableBody.removeChild(staticDOM.tableBody.children[i]);
-  }
-  dibujarTabla();
-}
 
 function validateIdCreate() {
   let result = false;
